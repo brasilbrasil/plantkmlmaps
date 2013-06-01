@@ -6,12 +6,16 @@ rootDir = arcpy.GetParameterAsText(0)
 
 # Input variables
 inputDir = rootDir + "data\\"
+##inputDir = "E:\\Cloud\\Dropbox\\map data\\"
 outputDir = rootDir + "output\\"
 baseDir = inputDir + "Maptiles\\"
 
+# Set workspace for ArcPy
 arcpy.env.workspace = outputDir
 
 # Read header.kml file into string
+# The header document is the opening XML and KML tags needed to built a compliant KML
+# document.
 headerPath = os.path.join(inputDir, "header.kml")
 headerFile = open(headerPath, "r")
 headerStr = headerFile.read()
@@ -37,6 +41,8 @@ all_sp_codes = column['species codes']
 # Start iterating through all the model code values
 sp_temps = range(1,1087)
 for sp_temp in sp_temps:
+    # This if statement can be used to limit the number of response
+    # zones processed for testing purposes
 ##    if (sp_temp == 5):
 ##        break
 ##    else:
@@ -52,9 +58,17 @@ for sp_temp in sp_temps:
         zoneKMLPath = os.path.join(outputDir, zoneKML)
         zoneKMZPath = os.path.join(outputDir, zoneName + ".kmz")
         zoneFCPath = os.path.join(zoneDirPath, "response_zone_" + new_sp_code + ".shp")
-        zoneRefLayer = os.path.join(inputDir, "reflyrs", "ref_lyr_response_zone_kml.lyr")
+        zoneRefLayer = os.path.join(inputDir, "reflyrs", "ref_lyr_response_zone_opkml.lyr")
 
+        # Check to see if the response zone folder exists before trying to process
         if os.path.exists(zoneDirPath):
+            # Build a new kml document and start writing to it
+            outputFile = open(zoneKMLPath, "w")
+            outputFile.write(headerStr)
+
+
+            # --- START PROCESSING RESPONSE ZONE --- #
+
             # Create a feature layer for the response zone and apply the preset symbology
             arcpy.MakeFeatureLayer_management(zoneFCPath, zoneName)
             arcpy.ApplySymbologyFromLayer_management(zoneName, zoneRefLayer)
@@ -64,14 +78,9 @@ for sp_temp in sp_temps:
             clamped = 'CLAMPED_TO_GROUND'
             arcpy.LayerToKML_conversion(zoneName, zoneKMZPath, '', composite, '', '', '', clamped)
 
-            # Create a new kml document and start writing to it
-            outputFile = open(zoneKMLPath, "w")
-            outputFile.write(headerStr)
-
             # Unzip the zone kmz generated previously
             zoneZipfile = zipfile.ZipFile(zoneKMZPath)
             zoneZipfile.extractall(outputDir)
-
 
             # Read the doc.kml from the zone.kmz
             zoneDocPath = os.path.join(outputDir, "doc.kml")
@@ -156,7 +165,6 @@ for sp_temp in sp_temps:
                     os.remove(pointsDocPath)
                     os.remove(pointsKMZPath)
 
-
             # --- START PROCESSING BASE LAYERS --- #
 
             # Get all reference to all the files and folders in the Maptile source folder
@@ -203,6 +211,13 @@ for sp_temp in sp_temps:
                 pngAbsPath = os.path.join(outputDir, pngFile)
                 zoneZipFile.write(pngAbsPath, pngRelPath)
                 os.remove(pngAbsPath)
+
+            # Add Legend PNG file to zip file
+            # Zip the png file into the Maptiles subdirectory
+            pngFile = "legend.png"
+            pngRelPath = "Maptiles/" + pngFile
+            pngAbsPath = os.path.join(inputDir, pngFile)
+            zoneZipFile.write(pngAbsPath, pngRelPath)
 
             # Close out zip file
             os.remove(zoneKMLPath)
