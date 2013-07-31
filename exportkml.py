@@ -3,7 +3,7 @@ import os.path
 # Set path to the root folder for input data
 #rootDir = arcpy.GetParameterAsText(0)
 #rootDir = r"C:\\Users\\lfortini\\Dropbox\\current work\\contracting shared folders\\map data - Copy\\"
-rootDir = r"Y:\\PICCC_analysis\\mapdata\\"
+rootDir = r"Y:\\PICCC_analysis\\plantKMLmaps\\"
 
 # Input variables
 inputDir = rootDir + "data\\"
@@ -22,7 +22,6 @@ headerFile = open(headerPath, "r")
 headerStr = headerFile.read()
 headerFile.close()
 
-
 # Read the Species Nomenclature Translation and Model Code List
 # (Copied from old script)
 csvname="%sspp_name_synonyms.csv" %(inputDir)
@@ -40,7 +39,7 @@ New_sp_names = column['Correct name']
 all_sp_codes = column['species codes']
 
 # Start iterating through all the model code values
-sp_temps = range(1,1087)
+sp_temps = range(5,7) #(1,1087)
 for sp_temp in sp_temps:
 	# This if statement can be used to limit the number of response
 	# zones processed for testing purposes
@@ -220,6 +219,13 @@ for sp_temp in sp_temps:
 			pngRelPath = "Maptiles/" + pngFile
 			pngAbsPath = os.path.join(inputDir, pngFile)
 			zoneZipFile.write(pngAbsPath, pngRelPath)
+			
+			# Add supporting doc file to zip file
+			# Zip the pdf file into the Maptiles subdirectory
+			pdfFile = "KML info.pdf"
+			#pngRelPath = "Maptiles/" + pdfFile
+			pngAbsPath = os.path.join(inputDir, pdfFile)
+			zoneZipFile.write(pngAbsPath, pdfFile)
 
 			# Close out zip file
 			os.remove(zoneKMLPath)
