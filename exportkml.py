@@ -10,6 +10,7 @@ inputDir = rootDir + "data\\"
 ##inputDir = "E:\\Cloud\\Dropbox\\map data\\"
 outputDir = rootDir + "output\\"
 baseDir = inputDir + "Maptiles\\"
+sppDir=r"Y:\\PICCC_analysis\\plant_landscape_va_results\\redone_w_eff_CE\\results\\all\\"
 
 # Set workspace for ArcPy
 arcpy.env.workspace = outputDir
@@ -39,7 +40,7 @@ New_sp_names = column['Correct name']
 all_sp_codes = column['species codes']
 
 # Start iterating through all the model code values
-sp_temps = range(5,7) #(1,1087)
+sp_temps = range(94,95) #(1,1087)
 for sp_temp in sp_temps:
 	# This if statement can be used to limit the number of response
 	# zones processed for testing purposes
@@ -53,7 +54,7 @@ for sp_temp in sp_temps:
 		print "doing KML for species " + new_sp_code
 
 		# Set up veriables for the response zone files
-		zoneDirPath = os.path.join(inputDir, "spp_data", new_sp_code)
+		zoneDirPath = os.path.join(sppDir, new_sp_code)
 		zoneName = "Response Zone " + new_sp_code
 		zoneKML = zoneName + ".kml"
 		zoneKMLPath = os.path.join(outputDir, zoneKML)
